@@ -1,4 +1,4 @@
-import { Box, Circle, Flex, HStack, Tabs, Text, VStack } from "@chakra-ui/react"
+import { Box, Button, Circle, CloseButton, Drawer, Flex, HStack, Input, Portal, Tabs, Text, VStack } from "@chakra-ui/react"
 import { useState } from "react"
 
 interface OrderItem {
@@ -39,7 +39,7 @@ const AllTabs = ({
             {orderDetails.map((order) => (
                 <Box key={order.id} borderRadius="lg" p={4} w="full">
                     <Flex alignItems="center" gap={5}>
-                        <Box w={32} h={32} bg="#ECECEC" borderRadius="md" />
+                        <Box w={32} h={32} bg="#ECECEC" />
                         <VStack gap={0} align="start" flex={1}>
                             <Flex
                                 flexDir="column"
@@ -156,36 +156,42 @@ const Order = () => {
         },
         {
             id: 3,
-            status: "Finished",
-            name: "Suya Pasta",
-            category: "kitchen"
-        },
-        {
-            id: 4,
-            status: "Available now",
-            name: "Grilled Chicken",
-            category: "kitchen"
-        },
-        {
-            id: 5,
-            status: "Finished",
-            name: "Pizza, Fried, Water",
-            category: "kitchen"
-        },
-        {
-            id: 6,
             status: "Available now",
             name: "Cocktail Mix",
             category: "bar"
         },
         {
+            id: 4,
+            status: "Finished",
+            name: "Suya Pasta",
+            category: "kitchen"
+        },
+        {
+            id: 5,
+            status: "Available now",
+            name: "Cocktail Mix",
+            category: "bar"
+        },
+        {
+            id: 6,
+            status: "Available now",
+            name: "Grilled Chicken",
+            category: "kitchen"
+        },
+        {
             id: 7,
+            status: "Finished",
+            name: "Pizza, Fried, Water",
+            category: "kitchen"
+        },
+        {
+            id: 8,
             status: "Available now",
             name: "Fresh Juice",
             category: "bar"
         },
         {
-            id: 8,
+            id: 9,
             status: "Finished",
             name: "Wine Selection",
             category: "bar"
@@ -221,10 +227,6 @@ const Order = () => {
             }
         })
     }
-
-    // const getTotalItems = (): number => {
-    //     return selectedOrders.reduce((total, order) => total + order.quantity, 0)
-    // }
 
     const getOrderSummary = (): string => {
         if (selectedOrders.length === 0) return "Nothing yet. Choose an option"
@@ -315,7 +317,7 @@ const Order = () => {
                 bg="#D9D9D9"
                 shadow="lg"
                 zIndex={20}
-                minW="250px"
+                minW="230px"
                 px={4}
                 borderRadius="lg"
             >
@@ -327,7 +329,7 @@ const Order = () => {
                         fontSize="sm"
                         transition="all 0.2s"
                     >
-                        <Text fontWeight="medium">Your order</Text>
+                        <Text>Your order</Text>
                         <Text>{getOrderSummary()}</Text>
                         {/* {getTotalItems() > 0 && (
                             <Text fontSize="xs" color="gray.600">
@@ -336,23 +338,142 @@ const Order = () => {
                         )} */}
                     </VStack>
                     {selectedOrders.length > 0 && (
-                        <Circle
-                            bg="black"
-                            color="white"
-                            size="50px"
-                            cursor="pointer"
-                            _hover={{
-                                bg: "gray.800",
-                                transform: "scale(1.05)"
-                            }}
-                            transition="all 0.2s"
-                            onClick={() => {
-                                // Handle checkout/proceed to next step
-                                console.log('Proceeding with order:', selectedOrders)
-                            }}
-                        >
-                            &gt;
-                        </Circle>
+                        <Drawer.Root size="sm" placement="end">
+                            <Drawer.Trigger asChild>
+                                <Circle
+                                    bg="black"
+                                    color="white"
+                                    size="50px"
+                                    cursor="pointer"
+                                    _hover={{
+                                        bg: "gray.800",
+                                        transform: "scale(1.05)"
+                                    }}
+                                    transition="all 0.2s"
+                                >
+                                    &gt;
+                                </Circle>
+                            </Drawer.Trigger>
+                            <Portal>
+                                <Drawer.Backdrop bg={"rgba(0, 0, 0, 0.50)"} backdropFilter={"blur(10px)"} />
+                                <Drawer.Positioner>
+                                    <Drawer.Content
+                                        bg={"#fff"}
+                                        color={"#000"}
+                                        className={"no-scrollbar"}
+                                        fontFamily={"font4"}
+                                        p={{ base: "0.675rem", md: "1rem" }}>
+                                        <Drawer.Header>
+                                            <Drawer.Title fontSize="3xl" fontWeight="light" mb={8}>Order Summary</Drawer.Title>
+                                        </Drawer.Header>
+                                        <Drawer.Body display="flex" flexDirection="column" justifyContent="space-between">
+                                            <Box mb={16}>
+                                                {selectedOrders.map((order) => (
+                                                    <Flex alignItems="center" justifyContent="space-between" mb={8}>
+                                                        <HStack>
+                                                            <Box w={12} h={12} border="1px solid #ACACAC" />
+                                                            <Text fontSize="lg">{order.name}</Text>
+                                                        </HStack>
+                                                        <Text fontSize="md">3mins</Text>
+                                                    </Flex>
+                                                ))}
+
+                                                <VStack gap={3} align="stretch">
+                                                    <Text
+                                                        fontSize="md"
+                                                        textTransform="uppercase"
+                                                        letterSpacing="wider"
+                                                    >
+                                                        Total Time ({selectedOrders.length * 3} mins)
+                                                    </Text>
+
+                                                    <Text
+                                                        fontSize="md"
+                                                        textTransform="uppercase"
+                                                        letterSpacing="wide"
+                                                    >
+                                                        Please Note
+                                                    </Text>
+
+                                                    <Box as="ul" listStyleType="disc" gap={3} pl={6} fontSize="md">
+                                                        <li>
+                                                            Server will bring it up to your table
+                                                        </li>
+
+                                                        <li>
+                                                            No additional step needed after placing order
+                                                        </li>
+
+                                                        <li>
+                                                            Only one order per time
+                                                        </li>
+
+                                                        <li>
+                                                            Order cannot be edited
+                                                        </li>
+                                                    </Box>
+                                                </VStack>
+                                            </Box>
+                                            <VStack gap={8}>
+                                                <VStack w="full" gap={4}>
+                                                    <Input
+                                                        id="name"
+                                                        placeholder="Full name"
+                                                        size="sm"
+                                                        border="1px solid"
+                                                        borderColor="#D9D9D9"
+                                                        rounded="none"
+                                                        bg="#D9D9D9"
+                                                        px={2}
+                                                        py={6}
+                                                    />
+                                                    <Input
+                                                        id="name"
+                                                        placeholder="Phone number"
+                                                        size="sm"
+                                                        border="1px solid"
+                                                        borderColor="#D9D9D9"
+                                                        rounded="none"
+                                                        bg="#D9D9D9"
+                                                        px={2}
+                                                        py={6}
+                                                    />
+                                                </VStack>
+                                                <Button
+                                                    cursor={"pointer"}
+                                                    bgColor="black"
+                                                    color="white"
+                                                    justifyContent={"center"}
+                                                    alignItems={"center"}
+                                                    fontSize={{ base: "0.785rem", md: "0.895rem" }}
+                                                    letterSpacing={"1px"}
+                                                    fontFamily={"font4"}
+                                                    _hover={{ bgColor: "black", color: "white" }}
+                                                    rounded="none"
+                                                    px={"1.5rem"}
+                                                    w={"full"}
+                                                    h={"50px"}
+                                                    mb={2.5}
+                                                >
+                                                    Order now
+                                                </Button>
+                                                <Text display="flex" gap={1} alignItems="center">
+                                                    <Text as="span">Powered by weddn.co</Text>
+                                                    <Text as="span">|</Text>
+                                                    <Text as="span" textDecor="underline" cursor="pointer">
+                                                        Contact us
+                                                    </Text>
+                                                </Text>
+                                            </VStack>
+                                        </Drawer.Body>
+
+                                        <Drawer.CloseTrigger asChild>
+                                            <CloseButton size="sm" bg="#D9D9D9" color="white" rounded="full" />
+                                        </Drawer.CloseTrigger>
+                                    </Drawer.Content>
+                                </Drawer.Positioner>
+                            </Portal>
+                        </Drawer.Root>
                     )}
                 </HStack>
             </Box>
