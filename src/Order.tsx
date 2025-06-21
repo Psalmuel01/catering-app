@@ -25,11 +25,6 @@ const AllTabs = ({
     onAddOrder: (order: OrderItem) => void
     onRemoveOrder: (orderId: number) => void
 }) => {
-    // const getOrderQuantity = (orderId: number): number => {
-    //     const selected = selectedOrders.find(order => order.id === orderId)
-    //     return selected ? selected.quantity : 0
-    // }
-
     const isOrderSelected = (orderId: number): boolean => {
         return selectedOrders.some(order => order.id === orderId)
     }
@@ -57,7 +52,7 @@ const AllTabs = ({
                             </Flex>
                             <Flex alignItems="center" gap={3}>
                                 <Circle
-                                    bg={order.status === "Finished" ? "#D9D9D9" : (isOrderSelected(order.id) ? "red.500" : "black")}
+                                    bg={order.status === "Finished" ? "#D9D9D9" : "black"}
                                     color={order.status === "Finished" ? "black" : "white"}
                                     size="50px"
                                     cursor={order.status === "Finished" ? "not-allowed" : "pointer"}
@@ -236,30 +231,105 @@ const Order = () => {
 
     return (
         <Box minH="100vh" position="relative">
-            <Flex h="full" justifyContent="end">
-                <Flex w="50%" justifyContent="center" position="fixed" bottom={0} left={0} maxH="100vh" pb={16}>
-                    <VStack gap={0}>
-                        <Text
-                            fontSize="4xl"
-                            fontWeight="normal"
-                            fontFamily="serif"
-                        >
-                            #BeeTee Bistro
-                        </Text>
-                        <Text
-                            fontSize="xl"
-                            fontWeight="normal"
-                        >Place your order
-                        </Text>
+            <Flex
+                h="full"
+                direction={{ base: "column", md: "row" }}
+                justifyContent={{ base: "start", md: "end" }}
+                align="start"
+            >
+                <Flex
+                    w={{ base: "100%", md: "50%" }}
+                    justifyContent="center"
+                    position={{ base: "relative", md: "fixed" }}
+                    bottom={{ base: "auto", md: 0 }}
+                    left={0}
+                    maxH="100vh"
+                    pb={{ base: 0, md: 16 }}
+                >
+                    <VStack
+                        gap={4}
+                        bgImage="url('/bgImg.png')"
+                        bgSize="cover"
+                        bgPos="center"
+                        bgRepeat="no-repeat"
+                        w="full"
+                        minH={{ base: "25vh", md: "100vh" }}
+                        justifyContent="center"
+                        alignItems="center"
+                        textAlign="center"
+                    >
+                        <Flex flexDir="column" color="white" alignItems="center" justifyContent={{ base: "space-between", md: "end" }} h="full" w="full" p={2.5} pb={{ base: 0, md: 50 }}>
+                            <Flex display={{ base: "flex", md: "none" }} color="white" justifyContent="space-between" alignItems="center" w="full">
+                                <Text fontSize="xl" fontWeight="normal" fontFamily="serif">
+                                    Table 10
+                                </Text>
+                                <HStack gap={4} fontSize="xs">
+                                    <Text cursor="pointer" _hover={{ textDecoration: "underline" }}>History</Text>
+                                    <Text cursor="pointer" _hover={{ textDecoration: "underline" }}>Leave a review</Text>
+                                </HStack>
+                            </Flex>
+                            <Flex flexDir="column" alignItems="center" gap={0} fontFamily="serif" color="white">
+                                <Text fontSize={{ base: "3xl", md: "5xl" }} lineHeight="1.2">
+                                    #BeeTee Bistro
+                                </Text>
+                                <Text fontSize={{ base: "lg", md: "2xl" }}>
+                                    Place your order
+                                </Text>
+                            </Flex>
+                            <Tabs.Root display={{ base: "block", md: "none" }} defaultValue="all" mx="auto" w="full">
+                                <Tabs.List gap={5} justifyContent="center" border="none">
+                                    <Tabs.Trigger value="all" color="white" border="1px solid" rounded="full" fontSize="xs" py={0} _selected={{ bg: "white", color: "black" }}>
+                                        All
+                                    </Tabs.Trigger>
+                                    <Tabs.Trigger value="kitchen" color="white" border="1px solid" rounded="full" fontSize="xs" py={0} _selected={{ bg: "white", color: "black" }}>
+                                        Kitchen
+                                    </Tabs.Trigger>
+                                    <Tabs.Trigger value="bar" color="white" border="1px solid" rounded="full" fontSize="xs" py={0} _selected={{ bg: "white", color: "black" }}>
+                                        Bar
+                                    </Tabs.Trigger>
+                                </Tabs.List>
+
+                                <Tabs.Content value="all">
+                                    {/* <AllTabs
+                                        orderDetails={orderDetails}
+                                        selectedOrders={selectedOrders}
+                                        onAddOrder={handleAddOrder}
+                                        onRemoveOrder={handleRemoveOrder}
+                                    /> */}
+                                </Tabs.Content>
+                                <Tabs.Content value="kitchen">
+                                    {/* <KitchenTabs
+                                        orderDetails={orderDetails}
+                                        selectedOrders={selectedOrders}
+                                        onAddOrder={handleAddOrder}
+                                        onRemoveOrder={handleRemoveOrder}
+                                    /> */}
+                                </Tabs.Content>
+                                <Tabs.Content value="bar">
+                                    {/* <BarTabs
+                                        orderDetails={orderDetails}
+                                        selectedOrders={selectedOrders}
+                                        onAddOrder={handleAddOrder}
+                                        onRemoveOrder={handleRemoveOrder}
+                                    /> */}
+                                </Tabs.Content>
+                            </Tabs.Root>
+                        </Flex>
                     </VStack>
                 </Flex>
-                <VStack bg="white" w="50%" h="full" px={16} py={8} justifyContent="start" alignItems="start" minH="100vh">
-                    <Flex justifyContent="space-between" alignItems="center" w="full">
-                        <Text
-                            fontSize="3xl"
-                            fontWeight="normal"
-                            fontFamily="serif"
-                        >
+
+                <VStack
+                    bg="white"
+                    w={{ base: "100%", md: "50%" }}
+                    h="full"
+                    px={{ base: 4, md: 16 }}
+                    py={{ base: 6, md: 8 }}
+                    justifyContent="start"
+                    alignItems="start"
+                    minH="100vh"
+                >
+                    <Flex display={{ base: "none", md: "flex" }} justifyContent="space-between" alignItems="center" w="full">
+                        <Text fontSize="3xl" fontWeight="normal" fontFamily="serif">
                             Table 10
                         </Text>
                         <HStack gap={4} fontSize="sm">
@@ -269,7 +339,7 @@ const Order = () => {
                     </Flex>
 
                     <Tabs.Root defaultValue="all" mx="auto" w="full">
-                        <Tabs.List gap={5} justifyContent="center" border="none">
+                        <Tabs.List gap={5} justifyContent="center" border="none" display={{ base: "none", md: "flex" }}>
                             <Tabs.Trigger value="all" color="black" border="1px solid" rounded="full" _selected={{ bg: "#D9D9D9" }}>
                                 All
                             </Tabs.Trigger>
@@ -280,6 +350,7 @@ const Order = () => {
                                 Bar
                             </Tabs.Trigger>
                         </Tabs.List>
+
                         <Tabs.Content value="all">
                             <AllTabs
                                 orderDetails={orderDetails}
@@ -311,17 +382,18 @@ const Order = () => {
             {/* Floating Order Summary */}
             <Box
                 position="fixed"
-                bottom={8}
-                right="25%"
-                transform="translateX(50%)"
+                bottom={{ base: "0", md: "8" }}
+                right={{ base: "0", md: "25vw" }}
+                transform={{ base: "translateX(0)", md: "translateX(50%)" }}
                 bg="#D9D9D9"
                 shadow="lg"
                 zIndex={20}
-                minW="230px"
+                minW={{ base: "100%", md: "230px" }}
+                w={{ base: "100%", md: "auto" }}
                 px={4}
-                borderRadius="lg"
+                borderRadius={{ base: "none", md: "lg" }}
             >
-                <HStack gap={4}>
+                <Flex alignItems={"center"} justifyContent="space-between" gap={4}>
                     <VStack
                         align="start"
                         px={5}
@@ -331,11 +403,6 @@ const Order = () => {
                     >
                         <Text>Your order</Text>
                         <Text>{getOrderSummary()}</Text>
-                        {/* {getTotalItems() > 0 && (
-                            <Text fontSize="xs" color="gray.600">
-                                Total items: {getTotalItems()}
-                            </Text>
-                        )} */}
                     </VStack>
                     {selectedOrders.length > 0 && (
                         <Drawer.Root size="sm" placement="end">
@@ -475,7 +542,7 @@ const Order = () => {
                             </Portal>
                         </Drawer.Root>
                     )}
-                </HStack>
+                </Flex>
             </Box>
         </Box>
     )
