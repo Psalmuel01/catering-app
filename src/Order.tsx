@@ -1,16 +1,23 @@
-import { Box, Button, Circle, CloseButton, Drawer, Flex, HStack, Input, Portal, Tabs, Text, VStack } from "@chakra-ui/react"
 import { useState } from "react"
+import { Box, Button, Circle, CloseButton, Drawer, Flex, HStack, Image, Input, Portal, Tabs, Text, VStack } from "@chakra-ui/react"
+import ofada from "/ofada.png";
+import friedrice from "/friedrice.png";
+import jollof from "/jollof.png";
+import pasta from "/pasta.png";
+import { toaster } from "./components/ui/toaster";
 
 interface OrderItem {
     id: number
     status: "Available now" | "Finished"
     name: string
     category: "all" | "kitchen" | "bar"
+    image?: string
 }
 
 interface SelectedOrder {
     id: number
     name: string
+    image?: string
     quantity: number
 }
 
@@ -18,23 +25,26 @@ const AllTabs = ({
     orderDetails,
     selectedOrders,
     onAddOrder,
-    onRemoveOrder
+    onRemoveOrder,
+    orderIsPending
 }: {
     orderDetails: OrderItem[]
     selectedOrders: SelectedOrder[]
     onAddOrder: (order: OrderItem) => void
     onRemoveOrder: (orderId: number) => void
+    orderIsPending: boolean
 }) => {
     const isOrderSelected = (orderId: number): boolean => {
         return selectedOrders.some(order => order.id === orderId)
     }
 
     return (
-        <VStack gap={4}>
+        <VStack gap={{ base: 0, md: 4 }}>
             {orderDetails.map((order) => (
-                <Box key={order.id} borderRadius="lg" p={4} w="full">
+                <Box key={order.id} borderRadius="lg" p={{ base: 2, md: 4 }} w="full">
                     <Flex alignItems="center" gap={5}>
-                        <Box w={32} h={32} bg="#ECECEC" />
+                        {order.image ? <Image src={order.image} alt={order.name} w={32} h={32} /> : <Box w={32} h={32} bg="#ECECEC" />}
+
                         <VStack gap={0} align="start" flex={1}>
                             <Flex
                                 flexDir="column"
@@ -58,7 +68,13 @@ const AllTabs = ({
                                     cursor={order.status === "Finished" ? "not-allowed" : "pointer"}
                                     onClick={() => {
                                         if (order.status === "Finished") return
-
+                                        if (orderIsPending) {
+                                            toaster.create({
+                                                description: "Sorry, can’t place new order while processing an order",
+                                                type: "error",
+                                            })
+                                            return
+                                        }
                                         if (isOrderSelected(order.id)) {
                                             onRemoveOrder(order.id)
                                         } else {
@@ -73,11 +89,6 @@ const AllTabs = ({
                                 >
                                     {isOrderSelected(order.id) ? "−" : "+"}
                                 </Circle>
-                                {/* {getOrderQuantity(order.id) > 0 && (
-                                    <Text fontSize="sm" fontWeight="medium">
-                                        Qty: {getOrderQuantity(order.id)}
-                                    </Text>
-                                )} */}
                             </Flex>
                         </VStack>
                     </Flex>
@@ -91,12 +102,14 @@ const KitchenTabs = ({
     orderDetails,
     selectedOrders,
     onAddOrder,
-    onRemoveOrder
+    onRemoveOrder,
+    orderIsPending
 }: {
     orderDetails: OrderItem[]
     selectedOrders: SelectedOrder[]
     onAddOrder: (order: OrderItem) => void
     onRemoveOrder: (orderId: number) => void
+    orderIsPending: boolean
 }) => {
     const kitchenOrders = orderDetails.filter(order => order.category === "kitchen")
 
@@ -106,6 +119,7 @@ const KitchenTabs = ({
             selectedOrders={selectedOrders}
             onAddOrder={onAddOrder}
             onRemoveOrder={onRemoveOrder}
+            orderIsPending={orderIsPending}
         />
     )
 }
@@ -114,12 +128,14 @@ const BarTabs = ({
     orderDetails,
     selectedOrders,
     onAddOrder,
-    onRemoveOrder
+    onRemoveOrder,
+    orderIsPending
 }: {
     orderDetails: OrderItem[]
     selectedOrders: SelectedOrder[]
     onAddOrder: (order: OrderItem) => void
     onRemoveOrder: (orderId: number) => void
+    orderIsPending: boolean
 }) => {
     const barOrders = orderDetails.filter(order => order.category === "bar")
 
@@ -129,11 +145,14 @@ const BarTabs = ({
             selectedOrders={selectedOrders}
             onAddOrder={onAddOrder}
             onRemoveOrder={onRemoveOrder}
+            orderIsPending={orderIsPending}
         />
     )
 }
 
 const Order = () => {
+    const [open, setOpen] = useState(false)
+    const [orderIsPending, setOrderIsPending] = useState(false)
     const [selectedOrders, setSelectedOrders] = useState<SelectedOrder[]>([])
 
     const orderDetails: OrderItem[] = [
@@ -141,25 +160,29 @@ const Order = () => {
             id: 1,
             status: "Available now",
             name: "Basmati Fried Rice",
-            category: "kitchen"
+            category: "kitchen",
+            image: friedrice
         },
         {
             id: 2,
             status: "Available now",
             name: "Smokey Jollof Rice",
-            category: "kitchen"
+            category: "kitchen",
+            image: jollof
         },
         {
             id: 3,
             status: "Available now",
-            name: "Cocktail Mix",
-            category: "bar"
+            name: "Ofada Rice Sauce",
+            category: "all",
+            image: ofada
         },
         {
             id: 4,
             status: "Finished",
             name: "Suya Pasta",
-            category: "kitchen"
+            category: "kitchen",
+            image: pasta
         },
         {
             id: 5,
@@ -203,7 +226,7 @@ const Order = () => {
                         : selected
                 )
             } else {
-                return [...prev, { id: order.id, name: order.name, quantity: 1 }]
+                return [...prev, { id: order.id, name: order.name, quantity: 1, image: order.image }]
             }
         })
     }
@@ -223,10 +246,26 @@ const Order = () => {
         })
     }
 
+    const handleSubmitOrder = () => {
+        setOpen(false)
+        setSelectedOrders([])
+        setOrderIsPending(true)
+        setTimeout(() => {
+            setOrderIsPending(false)
+        }, 10000)
+        console.log("Selected orders:", selectedOrders)
+        // Add your logic to submit the order here
+    }
+
     const getOrderSummary = (): string => {
         if (selectedOrders.length === 0) return "Nothing yet. Choose an option"
         if (selectedOrders.length === 1) return selectedOrders[0].name
         return `${selectedOrders.length} different items selected`
+    }
+
+    const getOrderTime = (): string => {
+        // Calculate the total time based on the number of selected orders
+        return "09mins 23secs"
     }
 
     return (
@@ -357,6 +396,7 @@ const Order = () => {
                                 selectedOrders={selectedOrders}
                                 onAddOrder={handleAddOrder}
                                 onRemoveOrder={handleRemoveOrder}
+                                orderIsPending={orderIsPending}
                             />
                         </Tabs.Content>
                         <Tabs.Content value="kitchen">
@@ -365,6 +405,7 @@ const Order = () => {
                                 selectedOrders={selectedOrders}
                                 onAddOrder={handleAddOrder}
                                 onRemoveOrder={handleRemoveOrder}
+                                orderIsPending={orderIsPending}
                             />
                         </Tabs.Content>
                         <Tabs.Content value="bar">
@@ -373,6 +414,7 @@ const Order = () => {
                                 selectedOrders={selectedOrders}
                                 onAddOrder={handleAddOrder}
                                 onRemoveOrder={handleRemoveOrder}
+                                orderIsPending={orderIsPending}
                             />
                         </Tabs.Content>
                     </Tabs.Root>
@@ -401,11 +443,11 @@ const Order = () => {
                         fontSize="sm"
                         transition="all 0.2s"
                     >
-                        <Text>Your order</Text>
-                        <Text>{getOrderSummary()}</Text>
+                        <Text>{orderIsPending ? "Order arrives in" : "Your order"}</Text>
+                        <Text>{orderIsPending ? getOrderTime() : getOrderSummary()}</Text>
                     </VStack>
                     {selectedOrders.length > 0 && (
-                        <Drawer.Root size="sm" placement="end">
+                        <Drawer.Root size="sm" placement="end" open={open} onOpenChange={(e) => setOpen(e.open)}>
                             <Drawer.Trigger asChild>
                                 <Circle
                                     bg="black"
@@ -438,7 +480,7 @@ const Order = () => {
                                                 {selectedOrders.map((order) => (
                                                     <Flex alignItems="center" justifyContent="space-between" mb={8}>
                                                         <HStack>
-                                                            <Box w={12} h={12} border="1px solid #ACACAC" />
+                                                            {order.image ? <Image src={order.image} alt={order.name} w={12} h={12} /> : <Box w={12} h={12} border="1px solid #ACACAC" />}
                                                             <Text fontSize="lg">{order.name}</Text>
                                                         </HStack>
                                                         <Text fontSize="md">3mins</Text>
@@ -521,6 +563,7 @@ const Order = () => {
                                                     w={"full"}
                                                     h={"50px"}
                                                     mb={2.5}
+                                                    onClick={handleSubmitOrder}
                                                 >
                                                     Order now
                                                 </Button>
